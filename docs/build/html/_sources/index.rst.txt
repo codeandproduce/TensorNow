@@ -14,7 +14,7 @@ Current version is 1.0.0.
 Big Picture Idea
 ****************
 1. Configure TensorNow into your code.
-2. Monitor the following aspects to your model progress:
+2. Monitor the following aspects to your model progress on the mobile app:
 	* Model convergence.
 	* Current and past loss values.
 	* **Whether your session has terminated (be notified of it).**
@@ -61,23 +61,30 @@ Then hook the library into your code. Minimal example::
 		
 		now.end_training() # Flag end training.
 
-		
+
 
 	train()
 
 
 
 
+***********
+Source Code
+***********
+
+This Python interface is hosted on `GitHub <https://github.com/codeandproduce/TensorNow/>`_.
+
+Please feel free to file an issue when you find a bug.
+
+
+*******************
+Authors and License
+*******************
+
+The TensorNow system is written by `Chan Woo Kim <http://chanwookim.com>`_.
+
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
