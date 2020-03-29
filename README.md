@@ -1,2 +1,4 @@
-# TensorNow
-Lightweight model progress monitoring solution for A.I. Developers.
+# Python Interface to TensorNow
+
+## Installation
+``` pip install TensorNow ```
