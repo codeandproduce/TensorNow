@@ -2,10 +2,17 @@ import numpy as np
 import requests
 import time
 
+
+requests.packages.urllib3.disable_warnings()
+
+
 # from notify_error import notify_error
 
 
-API_ENDPOINT_PROD = 'http://tensornow.com'
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
+
+API_ENDPOINT_PROD = 'https://tensornow.com'
 API_ENDPOINT = 'http://localhost:8000'
 
 
@@ -17,6 +24,8 @@ class Now:
 
 		self.premium = self.userData['premium']
 		self.exists = self.userData['exists']
+
+		print(self.userData)
 
 		if not self.exists:
 			raise Exception('User does not exist.')
@@ -80,17 +89,17 @@ class Now:
 						'api_key': self.API_KEY,
 						'loss_val_arr': self.logger['queued_losses']
 					}
-					response = requests.post(url, data=payload)
+					response = requests.post(url, data=payload, verify=False)
 					if not response.json()['success']:
-						print("Uploading loss values failed!!")
+						print("TENSORNOW: Uploading loss values failed!")
 					else:
 						if self.log_permission:
-							print("Loss values uploaded!")
+							print("TENSORNOW: Loss Values Uploaded.")
+						
 						self.logger['pushed_losses'] += self.logger['queued_losses']
 						self.logger['queued_losses'] = []
 						self.iteration_start_time = time.time()
-				else:
-					print("DEBUG### Has not been 40 seconds")
+				
 			
 			
 			else:
@@ -110,7 +119,7 @@ def init_user_check(username):
 	payload = {
 		'username': username
 	}
-	data = requests.post(url, data=payload)
+	data = requests.post(url, data=payload, verify=False)
 
 	returnLoad = {
 		'premium': data.json()['premium'],
@@ -128,7 +137,7 @@ def register_project(username, model_title, API_KEY):
 		'api_key': API_KEY
 	}
 
-	project = requests.post(url, data=payload)
+	project = requests.post(url, data=payload, verify=False)
 	project_ID = project.json()['projectID']
 	return project_ID
 
@@ -170,6 +179,20 @@ def notify_error(error_code, username, model_ID, API_KEY):
 		'projectID': model_ID,
 		'api_key': API_KEY,
 		'error_code': error_code
+    }
+
+    request.post(url, data=payload)
+	
+
+def notify_custom_error(username, model_ID, API_KEY, message):
+
+    url = API_ENDPOINT+'/api/user/project/custom-error'
+	
+    payload = {
+	    'username': username, 
+		'projectID': model_ID,
+		'api_key': API_KEY,
+		'message': message
     }
 
     request.post(url, data=payload)
