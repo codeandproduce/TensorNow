@@ -7,13 +7,12 @@ WAIT_TIME_SECONDS = 1
 ticker = threading.Event()
 
 now = Now('test', 
-'0LCgAknBzrC3MQ2lFUN3M3xshjsgFe',
+'A7qrnuCA2a9Spn5tYw9o50i15MwdWE',
 'Keras')
 
 now.log_permission = True
-
-
-now.clear_all_custom_flags();
+now.clear_all_custom_flags()
+now.clear_all_projects()
 
 
 CONVERGENCE_FLAG = now.create_custom_flag('My personal definition of model convergence.')
@@ -27,7 +26,7 @@ def get_loss_val(count):
 
 
 def train():
-	now.start_training('Big boy test')
+	now.start_training('Small boy test')
 	for i in range(0,1000000):
 		if(i==10):
 			now.flag(CONVERGENCE_FLAG)

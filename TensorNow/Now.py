@@ -69,7 +69,6 @@ class Now:
 		}
 		response = requests.post(url, data=payload)
 		response = response.json()
-		print(url, payload, response)
 		if not response['success']:
 			print("TENSORNOW (Error): Creating custom flag failed!")
 			return 0
@@ -93,7 +92,6 @@ class Now:
 		else:
 			if self.log_permission:						
 				print("TENSORNOW: Successfully flagged: ", flagUUID)
-		
 	def clear_all_custom_flags(self):
 		url = API_ENDPOINT + '/api/user/clear-custom-flags'
 		payload = {
@@ -103,12 +101,25 @@ class Now:
 		response = requests.post(url, data=payload)
 		response = response.json()
 		if not response['success']:
-			print("TENSORNOW (Error): Crearing custom flags failed.")
+			print("TENSORNOW (Error): Clearing custom flags failed.")
 			return 0
 		else:
 			if self.log_permission:						
 				print("TENSORNOW: Successfully cleared custom flags.")
-
+	def clear_all_projects(self):
+		url = API_ENDPOINT + '/api/user/clear-all-projects'
+		payload = {
+			'username': self.username,
+			'api_key': self.API_KEY
+		}
+		response = requests.post(url, data=payload)
+		response = response.json()
+		if not response['success']:
+			print("TENSORNOW (Error): Clearing all projects failed.")
+			return 0
+		else:
+			if self.log_permission:						
+				print("TENSORNOW: Successfully cleared all projects.")
 
 
 
