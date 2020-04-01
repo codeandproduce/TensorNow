@@ -4,26 +4,28 @@
    contain the root `toctree` directive.
 
 Welcome to TensorNow
-=====================================
+====================
 A lightweight model progress monitoring solution for independent A.I. developers.
 
 Current version is 1.0.0.
 
 
-****************
+
 Big Picture Idea
-****************
-1. Configure TensorNow into your code.
-2. Monitor the following aspects to your model progress on the mobile app:
+----------------
+1. Get an `API key <https://tensornow.com/get-api-register/>`_.
+2. Configure TensorNow into your code.
+3. Monitor the following aspects to your model progress on the mobile app:
 	* Model convergence.
 	* Current and past loss values.
 	* **Whether your session has terminated (be notified of it).**
 	* Anything else you want (custom flagging)
+4. **Please** read the "Restrictions & Best Practices" section.
 	
 
-********************
+
 Library Installation
-********************
+--------------------
 
 Install using pip::
 
@@ -32,17 +34,24 @@ Install using pip::
 
 
 
-***************
 Getting Started
-***************
+---------------
 
 First, create an account at `<http://www.tensornow.com/get-api-register/>`_ and get an API key.
 
-Then hook the library into your code. Minimal example::
+Then hook the library into your code.
+
+Minimal example
+~~~~~~~~~~~~~~~
+::
 
 	from TensorNow import Now
 
+	# initialize now object
 	now = Now('user_id', 'api_key')
+
+	# create custom flag
+	MODEL_COLLAPSE_FLAG = now.create_custom_flag("Model Collapse")
 
 
 	def get_loss_val(count):
@@ -50,36 +59,109 @@ Then hook the library into your code. Minimal example::
 		...
 
 	def train():
-		now.start_training('G.A.N. r=1e5')	# Flag start training
+		now.start_training('G.A.N. r=1e5')		# Flag start training
 		for i in range(epochs):
 			loss_val = get_loss_val()
-			now.log_loss(loss_val) # Upload loss values
+			now.log_loss(loss_val)		# Upload loss values
 
 			if loss_val>1000:
-				now.flag_error("Model Collapse")
+				now.flag("MODEL_COLLAPSE_FLAG)		# Custom flagging
 
 		
-		now.end_training() # Flag end training.
-
+		now.end_training()		# Flag end training.
 
 
 	train()
 
 
 
+Restrictions & Best Practices
+-----------------------------
 
-***********
+To enforce better organization and efficient use of remote storage, we limit the number of custom flags to 50 per user. Additionally, during the debugging stages of your development, expectedly you will repeatedly run and abort your code. This may lead to running the function::
+
+	now.start_training(...)
+
+many times, which will **create a new project every time**. You will be notified for interruptions in each of these projects (which you would have interrupted by exiting your program), which will lead to being flooded with notifications in your mobile app. 
+
+To resolve both of these issues, I highly recommend you include the code::
+
+	now = Now('username', 'api_key')
+
+	# these below!
+	now.clear_all_custom_flags()
+	now.clear_all_projects()
+
+right after the library initialization. This will make sure you don't initialize redundant projects and custom flags. 
+
+
+
+Features
+--------
+
+Logging Loss Values
+~~~~~~~~~~~~~~~~~~~
+Function(s) used::
+
+	now.log_loss(loss_value)
+
+This is the fundamental feature the TensorNow is built upon. The above function logs your loss values at any moment the function is called to the TensorNow system. You will be able to view these loss values in your mobile app, and in the back-end, based on these values, we will notify you of model convergence and model interruptions (a session crashing, for instance) to your app. 
+
+
+
+Custom Flagging
+~~~~~~~~~~~~~~~
+
+Function(s) used::
+
+	now.create_custom_flag(description)
+	now.flag(custom_flag_uuid)
+
+
+TensorNow provides notifications for model interruptions and other errors by default. But we also understand that you may be equally interested to be notified about other aspects of model training. For instance, you may want to define your own definition of convergence and wish to be notified of it if your model reaches that definition. For these types of custom interests, we have a custom flagging feature::
+
+
+	CONVERGENCE_FLAG = now.create_custom_flag('Custom convergence defn')
+
+	...
+
+	if loss_val < 0.0001:
+		now.flag(CONVERGENCE FLAG)
+
+Specifically::
+
+	now.create_custom_flag(desc)
+
+generates a unique UUID for the custom flag. By supplying the UUID to the::
+
+	now.flag(uuid)
+
+function, you are able to send the flag to the tensornow system, which will then notify your mobile app.
+
+
+
+Options
+-------
+
+Calling this after initializing the library object will hide print messages from the package::
+
+	now.log_permission = False # defaults to True.
+
+I recommend that you leave it as default only in the beginning when you're testing out the package. Afterwards, it may just redundantly clog your sysout. 
+
+
+
 Source Code
-***********
+-----------
 
 This Python interface is hosted on `GitHub <https://github.com/codeandproduce/TensorNow/>`_.
 
 Please feel free to file an issue when you find a bug.
 
 
-*******************
 Authors and License
-*******************
+-------------------
+
 
 The TensorNow system is written by `Chan Woo Kim <http://chanwookim.com>`_.
 

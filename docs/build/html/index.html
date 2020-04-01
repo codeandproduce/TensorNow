@@ -183,6 +183,7 @@ window.lang = "None";
 <div class="section" id="big-picture-idea">
 <h2>Big Picture Idea<a class="headerlink" href="#big-picture-idea" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic simple">
+<li><p>Get an <a class="reference external" href="https://tensornow.com/get-api-register/">API key</a>.</p></li>
 <li><p>Configure TensorNow into your code.</p></li>
 <li><dl class="simple">
 <dt>Monitor the following aspects to your model progress on the mobile app:</dt><dd><ul class="simple">
@@ -194,6 +195,7 @@ window.lang = "None";
 </dd>
 </dl>
 </li>
+<li><p><strong>Please</strong> read the “Restrictions &amp; Best Practices” section.</p></li>
 </ol>
 </div>
 <div class="section" id="library-installation">
@@ -206,10 +208,16 @@ window.lang = "None";
 <div class="section" id="getting-started">
 <h2>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h2>
 <p>First, create an account at <a class="reference external" href="http://www.tensornow.com/get-api-register/">http://www.tensornow.com/get-api-register/</a> and get an API key.</p>
-<p>Then hook the library into your code. Minimal example:</p>
+<p>Then hook the library into your code.</p>
+<div class="section" id="minimal-example">
+<h3>Minimal example<a class="headerlink" href="#minimal-example" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">TensorNow</span> <span class="kn">import</span> <span class="n">Now</span>
 
+<span class="c1"># initialize now object</span>
 <span class="n">now</span> <span class="o">=</span> <span class="n">Now</span><span class="p">(</span><span class="s1">&#39;user_id&#39;</span><span class="p">,</span> <span class="s1">&#39;api_key&#39;</span><span class="p">)</span>
+
+<span class="c1"># create custom flag</span>
+<span class="n">MODEL_COLLAPSE_FLAG</span> <span class="o">=</span> <span class="n">now</span><span class="o">.</span><span class="n">create_custom_flag</span><span class="p">(</span><span class="s2">&quot;Model Collapse&quot;</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">get_loss_val</span><span class="p">(</span><span class="n">count</span><span class="p">):</span>
@@ -217,22 +225,84 @@ window.lang = "None";
         <span class="o">...</span>
 
 <span class="k">def</span> <span class="nf">train</span><span class="p">():</span>
-        <span class="n">now</span><span class="o">.</span><span class="n">start_training</span><span class="p">(</span><span class="s1">&#39;G.A.N. r=1e5&#39;</span><span class="p">)</span>      <span class="c1"># Flag start training</span>
+        <span class="n">now</span><span class="o">.</span><span class="n">start_training</span><span class="p">(</span><span class="s1">&#39;G.A.N. r=1e5&#39;</span><span class="p">)</span>              <span class="c1"># Flag start training</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epochs</span><span class="p">):</span>
                 <span class="n">loss_val</span> <span class="o">=</span> <span class="n">get_loss_val</span><span class="p">()</span>
-                <span class="n">now</span><span class="o">.</span><span class="n">log_loss</span><span class="p">(</span><span class="n">loss_val</span><span class="p">)</span> <span class="c1"># Upload loss values</span>
+                <span class="n">now</span><span class="o">.</span><span class="n">log_loss</span><span class="p">(</span><span class="n">loss_val</span><span class="p">)</span>          <span class="c1"># Upload loss values</span>
 
                 <span class="k">if</span> <span class="n">loss_val</span><span class="o">&gt;</span><span class="mi">1000</span><span class="p">:</span>
-                        <span class="n">now</span><span class="o">.</span><span class="n">flag_error</span><span class="p">(</span><span class="s2">&quot;Model Collapse&quot;</span><span class="p">)</span>
+                        <span class="n">now</span><span class="o">.</span><span class="n">flag</span><span class="p">(</span><span class="s2">&quot;MODEL_COLLAPSE_FLAG)          # Custom flagging</span>
 
 
-        <span class="n">now</span><span class="o">.</span><span class="n">end_training</span><span class="p">()</span> <span class="c1"># Flag end training.</span>
-
+        <span class="n">now</span><span class="o">.</span><span class="n">end_training</span><span class="p">()</span>              <span class="c1"># Flag end training.</span>
 
 
 <span class="n">train</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
+</div>
+<div class="section" id="restrictions-best-practices">
+<h2>Restrictions &amp; Best Practices<a class="headerlink" href="#restrictions-best-practices" title="Permalink to this headline">¶</a></h2>
+<p>To enforce better organization and efficient use of remote storage, we limit the number of custom flags to 50 per user. Additionally, during the debugging stages of your development, expectedly you will repeatedly run and abort your code. This may lead to running the function:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">now</span><span class="o">.</span><span class="n">start_training</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>many times, which will <strong>create a new project every time</strong>. You will be notified for interruptions in each of these projects (which you would have interrupted by exiting your program), which will lead to being flooded with notifications in your mobile app.</p>
+<p>To resolve both of these issues, I highly recommend you include the code:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">now</span> <span class="o">=</span> <span class="n">Now</span><span class="p">(</span><span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="s1">&#39;api_key&#39;</span><span class="p">)</span>
+
+<span class="c1"># these below!</span>
+<span class="n">now</span><span class="o">.</span><span class="n">clear_all_custom_flags</span><span class="p">()</span>
+<span class="n">now</span><span class="o">.</span><span class="n">clear_all_projects</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>right after the library initialization. This will make sure you don’t initialize redundant projects and custom flags.</p>
+</div>
+<div class="section" id="features">
+<h2>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="logging-loss-values">
+<h3>Logging Loss Values<a class="headerlink" href="#logging-loss-values" title="Permalink to this headline">¶</a></h3>
+<p>Function(s) used:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">now</span><span class="o">.</span><span class="n">log_loss</span><span class="p">(</span><span class="n">loss_value</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This is the fundamental feature the TensorNow is built upon. The above function logs your loss values at any moment the function is called to the TensorNow system. You will be able to view these loss values in your mobile app, and in the back-end, based on these values, we will notify you of model convergence and model interruptions (a session crashing, for instance) to your app.</p>
+</div>
+<div class="section" id="custom-flagging">
+<h3>Custom Flagging<a class="headerlink" href="#custom-flagging" title="Permalink to this headline">¶</a></h3>
+<p>Function(s) used:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">now</span><span class="o">.</span><span class="n">create_custom_flag</span><span class="p">(</span><span class="n">description</span><span class="p">)</span>
+<span class="n">now</span><span class="o">.</span><span class="n">flag</span><span class="p">(</span><span class="n">custom_flag_uuid</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>TensorNow provides notifications for model interruptions and other errors by default. But we also understand that you may be equally interested to be notified about other aspects of model training. For instance, you may want to define your own definition of convergence and wish to be notified of it if your model reaches that definition. For these types of custom interests, we have a custom flagging feature:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CONVERGENCE_FLAG</span> <span class="o">=</span> <span class="n">now</span><span class="o">.</span><span class="n">create_custom_flag</span><span class="p">(</span><span class="s1">&#39;Custom convergence defn&#39;</span><span class="p">)</span>
+
+<span class="o">...</span>
+
+<span class="k">if</span> <span class="n">loss_val</span> <span class="o">&lt;</span> <span class="mf">0.0001</span><span class="p">:</span>
+        <span class="n">now</span><span class="o">.</span><span class="n">flag</span><span class="p">(</span><span class="n">CONVERGENCE</span> <span class="n">FLAG</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Specifically:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">now</span><span class="o">.</span><span class="n">create_custom_flag</span><span class="p">(</span><span class="n">desc</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>generates a unique UUID for the custom flag. By supplying the UUID to the:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">now</span><span class="o">.</span><span class="n">flag</span><span class="p">(</span><span class="n">uuid</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>function, you are able to send the flag to the tensornow system, which will then notify your mobile app.</p>
+</div>
+</div>
+<div class="section" id="options">
+<h2>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
+<p>Calling this after initializing the library object will hide print messages from the package:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">now</span><span class="o">.</span><span class="n">log_permission</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1"># defaults to True.</span>
+</pre></div>
+</div>
+<p>I recommend that you leave it as default only in the beginning when you’re testing out the package. Afterwards, it may just redundantly clog your sysout.</p>
 </div>
 <div class="section" id="source-code">
 <h2>Source Code<a class="headerlink" href="#source-code" title="Permalink to this headline">¶</a></h2>
