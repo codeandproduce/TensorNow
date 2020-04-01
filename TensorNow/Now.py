@@ -3,7 +3,6 @@ import requests
 import time
 
 
-requests.packages.urllib3.disable_warnings()
 
 
 # from notify_error import notify_error
@@ -24,8 +23,6 @@ class Now:
 
 		self.premium = self.userData['premium']
 		self.exists = self.userData['exists']
-
-		print(self.userData)
 
 		if not self.exists:
 			raise Exception('User does not exist.')
@@ -61,6 +58,63 @@ class Now:
 
 		self.starting_time = time.time()
 		self.iteration_start_time = time.time()
+
+	def create_custom_flag(self, flag_description):
+
+		url = API_ENDPOINT + '/api/user/create-custom-flag'
+		payload = {
+			'username': self.username,
+			'api_key': self.API_KEY,
+			'flagDescription': flag_description
+		}
+		response = requests.post(url, data=payload)
+		response = response.json()
+		print(url, payload, response)
+		if not response['success']:
+			print("TENSORNOW (Error): Creating custom flag failed!")
+			return 0
+		else:
+			return response['flagUUID']
+	
+
+	def flag(self, flagUUID):
+		url = API_ENDPOINT + '/api/user/flag-custom-flag'
+		payload = {
+			'username': self.username,
+			'api_key': self.API_KEY,
+			'customFlagUUID': flagUUID,
+			'projectID':self.process_ID 
+		}
+		response = requests.post(url, data=payload)
+		response = response.json()
+
+		if not response['success']:
+			print("TENSORNOW (Error): Creating custom flag failed!")
+		else:
+			if self.log_permission:						
+				print("TENSORNOW: Successfully flagged: ", flagUUID)
+		
+	def clear_all_custom_flags(self):
+		url = API_ENDPOINT + '/api/user/clear-custom-flags'
+		payload = {
+			'username': self.username,
+			'api_key': self.API_KEY
+		}
+		response = requests.post(url, data=payload)
+		response = response.json()
+		if not response['success']:
+			print("TENSORNOW (Error): Crearing custom flags failed.")
+			return 0
+		else:
+			if self.log_permission:						
+				print("TENSORNOW: Successfully cleared custom flags.")
+
+
+
+
+
+
+
 		
 	def log_loss(self, loss_raw):
 		self.ending_time = time.time()
@@ -70,11 +124,11 @@ class Now:
 		self.avg_time_per_loss = (self.avg_time_per_loss*self.number_iter + time_elapsed)/(self.number_iter+1)
 
 		if not self.training:
-			print("Haven't started a process yet.")
+			print("TENSORNOW (Error): Haven't started a process yet.")
 			print("Make sure you've flagged the following in the beginning: ")
 			print("now.start_training({project_title});")
 		else:
-			if not len(self.logger['queued_losses']) > 2000:
+			if not len(self.logger['queued_losses']) > 8000:
 				
 				self.logger['queued_losses'].append(loss_raw)
 			
@@ -103,14 +157,16 @@ class Now:
 			
 			
 			else:
-				print("You are calling loss_log too many times. ")
+				print("TENSORNOW (Error): You are calling loss_log too many times. ")
 				print("TensorNow will no longer upload your loss values.")
 				notify_error(1, self.username, self.process_ID, self.API_KEY)
 
 
 			# self.model.format_loss(self.project_full_id, loss_tensor)
 		self.starting_time = time.time()
-	def return_loss_log(project_full_id):
+
+
+	def return_loss_log(self, project_full_id):
 		return self.logger.pushed_losses
 
 
@@ -140,6 +196,7 @@ def register_project(username, model_title, API_KEY):
 	project = requests.post(url, data=payload, verify=False)
 	project_ID = project.json()['projectID']
 	return project_ID
+
 
 def temp_address_generator():
 	'''

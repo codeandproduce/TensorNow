@@ -67,6 +67,11 @@ Then hook the library into your code. Minimal example::
 
 
 
+*******
+Options
+*******
+
+now.log_permission = False
 
 
 ***********
