@@ -6,10 +6,17 @@ WAIT_TIME_SECONDS = 1
 
 ticker = threading.Event()
 
-thisNow = Now('cwkeam', 
-'UrgiZEfdQ3EfLgZRhrGqkZXCswS2JJ',
+now = Now('test', 
+'A7qrnuCA2a9Spn5tYw9o50i15MwdWE',
 'Keras')
 
+now.log_permission = True
+now.clear_all_custom_flags()
+now.clear_all_projects()
+
+
+CONVERGENCE_FLAG = now.create_custom_flag('My personal definition of model convergence.')
+GRADIENT_VANISHING_FLAG = now.create_custom_flag("Gradient Vanishing")
 
 
 def get_loss_val(count):
@@ -19,10 +26,15 @@ def get_loss_val(count):
 
 
 def train():
-	thisNow.start_training('ConvNet r=1e5')
+	now.start_training('Small boy test')
 	for i in range(0,1000000):
+		if(i==10):
+			now.flag(CONVERGENCE_FLAG)
+		if(i==20):
+			now.flag(GRADIENT_VANISHING_FLAG)
+
 		loss_val = get_loss_val(i)**2
-		thisNow.log_loss(loss_val)
+		now.log_loss(loss_val)
 
 train()
 
