@@ -65,7 +65,7 @@ Minimal example
 			now.log_loss(loss_val)		# Upload loss values
 
 			if loss_val>1000:
-				now.flag("MODEL_COLLAPSE_FLAG)		# Custom flagging
+				now.flag("MODEL_COLLAPSE_FLAG")		# Custom flagging
 
 		
 		now.end_training()		# Flag end training.

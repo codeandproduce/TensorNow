@@ -1,6 +1,7 @@
 import numpy as np
 import requests
 import time
+import logging
 
 
 
@@ -11,12 +12,12 @@ import time
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
 
-API_ENDPOINT_PROD = 'https://tensornow.com'
-API_ENDPOINT = 'http://localhost:8000'
+API_ENDPOINT = 'https://tensornow.com'
+API_ENDPOINT_DEV = 'http://localhost:8000'
 
 
 class Now:
-	def __init__(self,username, API_KEY, framework):
+	def __init__(self,username, API_KEY):
 		# permissions
 		self.log_permission = True
 		self.userData = init_user_check(username)
@@ -34,15 +35,9 @@ class Now:
 		self.iteration_start_time = 0
 
 		self.training = False
-		self.framework = framework
 		self.username = username
 		self.API_KEY = API_KEY
-		if framework == 'Keras':
-			self.model = KerasModel(username, API_KEY)
-		elif framework == 'SKLearn':
-			self.model = SKLearnModel()
-		else:
-			self.model = GenericModel()
+		
 
 		self.logger = {}
 
@@ -50,7 +45,7 @@ class Now:
 		self.training = True
 		self.model_title = model_title
 		self.process_ID = register_project(self.username, model_title, self.API_KEY)
-		self.project_full_id = self.model_title + "-" + str(self.process_ID);
+		self.project_full_id = self.model_title + "-" + str(self.process_ID)
 		self.logger = {
 			'pushed_losses': [],
 			'queued_losses': []
@@ -70,7 +65,7 @@ class Now:
 		response = requests.post(url, data=payload)
 		response = response.json()
 		if not response['success']:
-			print("TENSORNOW (Error): Creating custom flag failed!")
+			logging.error("TENSORNOW (Error): Creating custom flag failed!")
 			return 0
 		else:
 			return response['flagUUID']
@@ -88,10 +83,10 @@ class Now:
 		response = response.json()
 
 		if not response['success']:
-			print("TENSORNOW (Error): Creating custom flag failed!")
+			logging.error("TENSORNOW (Error): Creating custom flag failed!")
 		else:
 			if self.log_permission:						
-				print("TENSORNOW: Successfully flagged: ", flagUUID)
+				logging.info("TENSORNOW: Successfully flagged: ", flagUUID)
 	def clear_all_custom_flags(self):
 		url = API_ENDPOINT + '/api/user/clear-custom-flags'
 		payload = {
@@ -101,11 +96,11 @@ class Now:
 		response = requests.post(url, data=payload)
 		response = response.json()
 		if not response['success']:
-			print("TENSORNOW (Error): Clearing custom flags failed.")
+			logging.error("TENSORNOW (Error): Clearing custom flags failed.")
 			return 0
 		else:
 			if self.log_permission:						
-				print("TENSORNOW: Successfully cleared custom flags.")
+				logging.info("TENSORNOW: Successfully cleared custom flags.")
 	def clear_all_projects(self):
 		url = API_ENDPOINT + '/api/user/clear-all-projects'
 		payload = {
@@ -115,11 +110,11 @@ class Now:
 		response = requests.post(url, data=payload)
 		response = response.json()
 		if not response['success']:
-			print("TENSORNOW (Error): Clearing all projects failed.")
+			logging.error("TENSORNOW (Error): Clearing all projects failed.")
 			return 0
 		else:
 			if self.log_permission:						
-				print("TENSORNOW: Successfully cleared all projects.")
+				logging.info("TENSORNOW: Successfully cleared all projects.")
 
 
 
@@ -135,15 +130,12 @@ class Now:
 		self.avg_time_per_loss = (self.avg_time_per_loss*self.number_iter + time_elapsed)/(self.number_iter+1)
 
 		if not self.training:
-			print("TENSORNOW (Error): Haven't started a process yet.")
-			print("Make sure you've flagged the following in the beginning: ")
-			print("now.start_training({project_title});")
+			logging.error("TENSORNOW (Error): Haven't started a process yet. \n Make sure you've flagged the following in the beginning: \n now.start_training({project_title});")
 		else:
 			if not len(self.logger['queued_losses']) > 8000:
 				
 				self.logger['queued_losses'].append(loss_raw)
 			
-
 				current_time = time.time()
 				if (current_time-self.iteration_start_time)>self.interval:
 					# if it's been 40 seconds since the last iteration:
@@ -156,10 +148,10 @@ class Now:
 					}
 					response = requests.post(url, data=payload, verify=False)
 					if not response.json()['success']:
-						print("TENSORNOW: Uploading loss values failed!")
+						logging.error("TENSORNOW (Error): Uploading loss values failed!")
 					else:
 						if self.log_permission:
-							print("TENSORNOW: Loss Values Uploaded.")
+							logging.info("TENSORNOW: Loss Values Uploaded.")
 						
 						self.logger['pushed_losses'] += self.logger['queued_losses']
 						self.logger['queued_losses'] = []
@@ -168,9 +160,8 @@ class Now:
 			
 			
 			else:
-				print("TENSORNOW (Error): You are calling loss_log too many times. ")
-				print("TensorNow will no longer upload your loss values.")
-				notify_error(1, self.username, self.process_ID, self.API_KEY)
+				logging.error("TENSORNOW (Error): You are calling loss_log too many times. TensorNow will no longer upload your loss values.")
+				# notify_error(1, self.username, self.process_ID, self.API_KEY)
 
 
 			# self.model.format_loss(self.project_full_id, loss_tensor)
@@ -216,24 +207,6 @@ def temp_address_generator():
 	'''
 	return np.random.randint(low=1, high=100, size=1)[0]
 
-
-class KerasModel:
-	def __init__(self, username, API_KEY):
-		self.model = 'keras'
-		self.username = username
-		self.API_KEY = API_KEY
-
-	def log_loss(self, processID, loss_tensor):
-		print("@"+self.username+' of API'+self.API_KEY+' for process '+str(processID)+' log loss: '+str(loss_tensor))
-
-class GenericModel:
-	def __init__(self):
-			self.model = 'generic'
-
-
-class SKLearnModel:
-	def __init__(self):
-		self.model = 'sklearn'
 
 
 
