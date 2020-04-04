@@ -207,14 +207,14 @@ window.lang = "None";
 </div>
 <div class="section" id="getting-started">
 <h2>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h2>
-<p>First, create an account at <a class="reference external" href="http://www.tensornow.com/get-api-register/">http://www.tensornow.com/get-api-register/</a> and get an API key.</p>
+<p>First, create an account at <a class="reference external" href="https://www.tensornow.com/get-api-register/">https://www.tensornow.com/get-api-register/</a> and get an API key.</p>
 <p>Then hook the library into your code.</p>
 <div class="section" id="minimal-example">
 <h3>Minimal example<a class="headerlink" href="#minimal-example" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">TensorNow</span> <span class="kn">import</span> <span class="n">Now</span>
 
 <span class="c1"># initialize now object</span>
-<span class="n">now</span> <span class="o">=</span> <span class="n">Now</span><span class="p">(</span><span class="s1">&#39;user_id&#39;</span><span class="p">,</span> <span class="s1">&#39;api_key&#39;</span><span class="p">)</span>
+<span class="n">now</span> <span class="o">=</span> <span class="n">Now</span><span class="p">(</span><span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="s1">&#39;api_key&#39;</span><span class="p">)</span>
 
 <span class="c1"># create custom flag</span>
 <span class="n">MODEL_COLLAPSE_FLAG</span> <span class="o">=</span> <span class="n">now</span><span class="o">.</span><span class="n">create_custom_flag</span><span class="p">(</span><span class="s2">&quot;Model Collapse&quot;</span><span class="p">)</span>
@@ -231,7 +231,7 @@ window.lang = "None";
                 <span class="n">now</span><span class="o">.</span><span class="n">log_loss</span><span class="p">(</span><span class="n">loss_val</span><span class="p">)</span>          <span class="c1"># Upload loss values</span>
 
                 <span class="k">if</span> <span class="n">loss_val</span><span class="o">&gt;</span><span class="mi">1000</span><span class="p">:</span>
-                        <span class="n">now</span><span class="o">.</span><span class="n">flag</span><span class="p">(</span><span class="s2">&quot;MODEL_COLLAPSE_FLAG)          # Custom flagging</span>
+                        <span class="n">now</span><span class="o">.</span><span class="n">flag</span><span class="p">(</span><span class="s2">&quot;MODEL_COLLAPSE_FLAG&quot;</span><span class="p">)</span>         <span class="c1"># Custom flagging</span>
 
 
         <span class="n">now</span><span class="o">.</span><span class="n">end_training</span><span class="p">()</span>              <span class="c1"># Flag end training.</span>

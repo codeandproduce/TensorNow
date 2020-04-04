@@ -37,7 +37,7 @@ Install using pip::
 Getting Started
 ---------------
 
-First, create an account at `<http://www.tensornow.com/get-api-register/>`_ and get an API key.
+First, create an account at `<https://www.tensornow.com/get-api-register/>`_ and get an API key.
 
 Then hook the library into your code.
 
@@ -48,7 +48,7 @@ Minimal example
 	from TensorNow import Now
 
 	# initialize now object
-	now = Now('user_id', 'api_key')
+	now = Now('username', 'api_key')
 
 	# create custom flag
 	MODEL_COLLAPSE_FLAG = now.create_custom_flag("Model Collapse")
@@ -65,7 +65,7 @@ Minimal example
 			now.log_loss(loss_val)		# Upload loss values
 
 			if loss_val>1000:
-				now.flag("MODEL_COLLAPSE_FLAG)		# Custom flagging
+				now.flag("MODEL_COLLAPSE_FLAG")		# Custom flagging
 
 		
 		now.end_training()		# Flag end training.

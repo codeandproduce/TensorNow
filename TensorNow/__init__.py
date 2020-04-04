@@ -1,2 +1,2 @@
-from TensorNow.Now import Now
+from tensornow.Now import Now
 
