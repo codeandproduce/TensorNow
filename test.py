@@ -1,4 +1,4 @@
-from TensorNow import Now
+from tensornow import Now
 import threading, time
 import numpy as np
 

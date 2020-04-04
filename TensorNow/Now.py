@@ -12,6 +12,9 @@ import logging
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
 
+requests.packages.urllib3.disable_warnings()
+
+
 API_ENDPOINT = 'https://tensornow.com'
 API_ENDPOINT_DEV = 'http://localhost:8000'
 
